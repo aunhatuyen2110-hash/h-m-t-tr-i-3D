@@ -1,0 +1,136 @@
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#eef1f8;
+  --panel:#ffffff;
+  --ink:#141a2e;
+  --muted:#59657f;
+  --line:#dbe0ee;
+  --chip:#eef1f8;
+  --field:#e3e8f4;
+  --focus:#0a6fa3;
+  --amber:#b45f06;
+  --cyan:#0a78a8;
+  --violet:#6d47c9;
+  --pink:#d6336c;
+  --stage:#05070f;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#090d1a; --panel:#0e1528; --ink:#e8edf7; --muted:#93a0bf; --line:#1f2942;
+    --chip:#16203a; --field:#22304f; --focus:#6fd3ff;
+    --amber:#ffb454; --cyan:#6fd3ff; --violet:#b79cff; --pink:#ff6b9a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#090d1a; --panel:#0e1528; --ink:#e8edf7; --muted:#93a0bf; --line:#1f2942;
+  --chip:#16203a; --field:#22304f; --focus:#6fd3ff;
+  --amber:#ffb454; --cyan:#6fd3ff; --violet:#b79cff; --pink:#ff6b9a;
+}
+*,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none !important}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  height:100%;margin:0;background:var(--bg);color:var(--ink);
+  font:400 15px/1.55 'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+#app{height:100%;display:grid;grid-template-columns:minmax(0,1fr) 384px}
+#stage{position:relative;min-height:0;overflow:hidden;background:var(--stage)}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab;outline:none}
+#gl.drag{cursor:grabbing}
+#gl:focus-visible{box-shadow:inset 0 0 0 2px var(--focus)}
+
+#railWrap{
+  position:absolute;top:12px;left:12px;right:12px;z-index:2;
+}
+#rail{
+  display:flex;gap:6px;overflow-x:auto;padding:2px 34px 6px;scrollbar-width:none;
+  scroll-behavior:smooth;
+}
+#rail::-webkit-scrollbar{display:none}
+.railFade{
+  position:absolute;top:0;bottom:6px;width:34px;pointer-events:none;z-index:1;
+  opacity:0;transition:opacity .25s;
+}
+.railFade.left{left:0;background:linear-gradient(90deg,rgba(5,7,15,.85),rgba(5,7,15,0))}
+.railFade.right{right:0;background:linear-gradient(270deg,rgba(5,7,15,.85),rgba(5,7,15,0))}
+.railFade.show{opacity:1}
+.railNav{
+  position:absolute;top:4px;width:26px;height:26px;border-radius:50%;z-index:3;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.22);background:rgba(12,18,36,.85);color:#e8edf7;
+  font-size:15px;line-height:1;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.railNav.show{opacity:1;pointer-events:auto}
+.railNav:hover{background:rgba(30,40,72,.92)}
+.railNav.prev{left:0}
+.railNav.next{right:0}
+.chip{
+  flex:none;display:flex;align-items:center;gap:8px;
+  padding:7px 13px 7px 8px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.16);
+  background:rgba(12,18,36,.72);color:#e8edf7;
+  font:500 13px/1.25 'Be Vietnam Pro',system-ui,sans-serif;cursor:pointer;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.chip:hover{background:rgba(30,40,72,.85)}
+.chip[aria-pressed="true"]{background:#e8edf7;color:#0b1226;border-color:#e8edf7}
+.chip:focus-visible,.btn:focus-visible,.check input:focus-visible,#speed:focus-visible,.railNav:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.disc{width:18px;height:18px;border-radius:50%;flex:none;background:radial-gradient(circle at 34% 30%,var(--c1),var(--c2))}
+
+#hint{
+  position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:2;
+  padding:6px 14px;border-radius:999px;background:rgba(12,18,36,.7);color:#c9d3ea;
+  font-size:12.5px;white-space:nowrap;pointer-events:none;transition:opacity .4s;
+}
+#hint.gone{opacity:0}
+#loading{
+  position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+#loading span{padding:9px 16px;border-radius:12px;background:rgba(12,18,36,.82);color:#e8edf7;font-size:14px}
+#fail{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:#e8edf7}
+
+#panel{min-height:0;overflow:auto;background:var(--panel);border-left:1px solid var(--line);padding:22px 22px 28px}
+h1{margin:0;font-size:30px;line-height:1.15;font-weight:700;letter-spacing:-.01em}
+.sub{margin:4px 0 16px;color:var(--muted);font-size:14px}
+dl{margin:0}
+.stat{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-top:1px solid var(--line)}
+.stat:last-child{border-bottom:1px solid var(--line)}
+dt{color:var(--muted);font-size:13.5px}
+dd{margin:0;text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.stat.key dd{font-size:17px}
+.fact{margin:16px 0 0;font-size:14.5px;line-height:1.65}
+h2{margin:26px 0 10px;font-size:16px;font-weight:600}
+.readout{
+  display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:10px;background:var(--chip);
+  font-variant-numeric:tabular-nums;font-size:14px;
+}
+.readout b{font-weight:600}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:14px 0 6px}
+.row label{font-weight:500}
+.row output{color:var(--muted);font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+#speed{width:100%;accent-color:var(--focus);margin:0}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.btn{
+  padding:9px 13px;border-radius:10px;border:1px solid var(--line);background:var(--chip);color:var(--ink);
+  font:500 13.5px/1.25 'Be Vietnam Pro',system-ui,sans-serif;cursor:pointer;
+}
+.btn:hover{background:var(--field)}
+.btn.primary{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.btn.primary:hover{opacity:.9}
+.check{display:flex;align-items:center;gap:10px;padding:7px 0;cursor:pointer;font-size:14px}
+.check input{width:17px;height:17px;margin:0;accent-color:var(--focus)}
+.sw{width:18px;height:4px;border-radius:2px;flex:none;background:var(--sw)}
+.check.plain{color:var(--muted);font-size:13.5px}
+.foot{margin:22px 0 0;color:var(--muted);font-size:12.5px;line-height:1.6}
+
+@media (max-width:860px){
+  #app{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,46%) minmax(0,1fr)}
+  #panel{border-left:0;border-top:1px solid var(--line);padding:16px 16px 26px}
+  h1{font-size:25px}
+  #hint{font-size:12px;bottom:10px}
+}
+@media (prefers-reduced-motion: reduce){#hint{transition:none}}
