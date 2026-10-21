@@ -24,54 +24,108 @@
     <div id="hint">Kéo để xoay góc nhìn, cuộn hoặc chụm hai ngón để thu phóng</div>
     <div id="loading" hidden><span id="loadingText"></span></div>
     <div id="fail" hidden></div>
+
+    <!-- Nút nổi để mở/sổ xuống bảng thông tin khi đang thu gọn -->
+    <button type="button" id="panelExpandBtn" class="floating-panel-toggle" aria-label="Mở bảng thông tin" title="Mở bảng thông tin (Phím I)">
+      <span class="toggle-dot" id="expandBtnDot"></span>
+      <span class="toggle-text-wrap">
+        <span class="toggle-mini-tag">Thông tin</span>
+        <strong class="toggle-title" id="expandBtnTitle">Hệ Mặt Trời</strong>
+      </span>
+      <span class="toggle-arrow" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </span>
+    </button>
   </main>
 
-  <aside id="panel">
+  <aside id="panel" aria-label="Bảng thông tin thiên thể">
+    <!-- Thanh Header điều khiển thu gọn của bảng thông tin -->
+    <div class="panel-header-bar">
+      <div class="panel-badge">
+        <span class="panel-badge-dot" id="panelBadgeDot"></span>
+        <span class="panel-badge-text" id="panelBadgeText">Hệ Mặt Trời</span>
+      </div>
+      <button type="button" id="panelCollapseBtn" class="panel-toggle-btn" title="Thu gọn bảng thông tin (Phím I)" aria-label="Thu gọn bảng thông tin">
+        <span class="btn-text">Thu gọn</span>
+        <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Thanh kéo dành cho thiết bị di động -->
+    <div class="mobile-drag-bar" id="mobileDragBar" aria-hidden="true">
+      <span class="drag-handle"></span>
+    </div>
+
     <button id="btn-back-solar" class="btn primary" style="margin-bottom:16px; width:100%; display:none;">‹ Trở về Hệ Mặt Trời</button>
     <h1 id="name">Trái Đất</h1>
     <p class="sub" id="sub"></p>
 
-    <div id="planetOnlyInfo">
-    <dl>
-      <div class="stat key"><dt>Độ nghiêng của trục</dt><dd id="s-tilt"></dd></div>
-      <div class="stat key"><dt>Một vòng tự quay</dt><dd id="s-period"></dd></div>
-      <div class="stat"><dt>Chiều quay</dt><dd id="s-dir"></dd></div>
-      <div class="stat"><dt>Đường kính</dt><dd id="s-diam"></dd></div>
-      <div class="stat" id="row-dist"><dt>Cách Mặt Trời</dt><dd id="s-dist"></dd></div>
-    </dl>
+    <!-- Khối Thông số (dành cho hành tinh) dạng Accordion -->
+    <div id="planetOnlyInfo" class="accordion-section open">
+      <button type="button" class="accordion-header" aria-expanded="true">
+        <h2>Thông số thiên thể</h2>
+        <svg class="accordion-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div class="accordion-content">
+        <dl>
+          <div class="stat key"><dt>Độ nghiêng của trục</dt><dd id="s-tilt"></dd></div>
+          <div class="stat key"><dt>Một vòng tự quay</dt><dd id="s-period"></dd></div>
+          <div class="stat"><dt>Chiều quay</dt><dd id="s-dir"></dd></div>
+          <div class="stat"><dt>Đường kính</dt><dd id="s-diam"></dd></div>
+          <div class="stat" id="row-dist"><dt>Cách Mặt Trời</dt><dd id="s-dist"></dd></div>
+        </dl>
+      </div>
     </div>
 
     <p class="fact" id="fact"></p>
 
-    <h2>Điều khiển thời gian</h2>
-    <div class="readout" aria-live="off">
-      <span>Đã quay <b id="r-turns">0</b></span>
-      <span id="r-time">0 giờ</span>
+    <!-- Khối Điều khiển thời gian dạng Accordion -->
+    <div class="accordion-section open" id="sec-time">
+      <button type="button" class="accordion-header" aria-expanded="true">
+        <h2>Điều khiển thời gian</h2>
+        <svg class="accordion-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div class="accordion-content">
+        <div class="readout" aria-live="off">
+          <span>Đã quay <b id="r-turns">0</b></span>
+          <span id="r-time">0 giờ</span>
+        </div>
+        <div class="row">
+          <label for="speed">Tốc độ thời gian</label>
+          <output id="speedOut" for="speed"></output>
+        </div>
+        <input type="range" id="speed" min="-1" max="4" step="0.02" value="0">
+        <div class="btns">
+          <button class="btn primary" id="play" type="button">Tạm dừng</button>
+          <button class="btn" id="reset" type="button">Quay lại từ đầu</button>
+        </div>
+        <label class="check plain"><input type="checkbox" id="keepSpeed"> Giữ nguyên tốc độ khi đổi thiên thể</label>
+      </div>
     </div>
-    <div class="row">
-      <label for="speed">Tốc độ thời gian</label>
-      <output id="speedOut" for="speed"></output>
-    </div>
-    <input type="range" id="speed" min="-1" max="4" step="0.02" value="0">
-    <div class="btns">
-      <button class="btn primary" id="play" type="button">Tạm dừng</button>
-      <button class="btn" id="reset" type="button">Quay lại từ đầu</button>
-    </div>
-    <label class="check plain"><input type="checkbox" id="keepSpeed"> Giữ nguyên tốc độ khi đổi thiên thể</label>
 
-    <div id="planetViews">
-    <h2>Góc nhìn</h2>
-    <div class="btns" style="margin-top:0">
-      <button class="btn" type="button" data-view="side" title="Nhìn ngang để thấy rõ độ nghiêng của trục">Nhìn ngang</button>
-      <button class="btn" type="button" data-view="top" title="Nhìn từ phía trên mặt phẳng quỹ đạo">Nhìn từ trên xuống</button>
-      <button class="btn" type="button" data-view="pole" title="Nhìn dọc theo trục quay để thấy rõ chiều quay">Nhìn từ cực Bắc</button>
-    </div>
+    <!-- Khối Góc nhìn & Hiển thị dạng Accordion -->
+    <div id="planetViews" class="accordion-section open">
+      <button type="button" class="accordion-header" aria-expanded="true">
+        <h2>Góc nhìn &amp; Hiển thị</h2>
+        <svg class="accordion-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div class="accordion-content">
+        <div class="btns" style="margin-top:2px; margin-bottom:14px">
+          <button class="btn" type="button" data-view="side" title="Nhìn ngang để thấy rõ độ nghiêng của trục">Nhìn ngang</button>
+          <button class="btn" type="button" data-view="top" title="Nhìn từ phía trên mặt phẳng quỹ đạo">Nhìn từ trên xuống</button>
+          <button class="btn" type="button" data-view="pole" title="Nhìn dọc theo trục quay để thấy rõ chiều quay">Nhìn từ cực Bắc</button>
+        </div>
 
-    <h2>Hiển thị</h2>
-    <label class="check"><input type="checkbox" id="t-axis" checked><span class="sw" style="--sw:var(--amber)"></span>Trục quay và góc nghiêng</label>
-    <label class="check"><input type="checkbox" id="t-plane" checked><span class="sw" style="--sw:var(--cyan)"></span>Mặt phẳng quỹ đạo</label>
-    <label class="check"><input type="checkbox" id="t-eq" checked><span class="sw" style="--sw:var(--violet)"></span>Đường xích đạo</label>
-    <label class="check"><input type="checkbox" id="t-mer" checked><span class="sw" style="--sw:var(--pink)"></span>Kinh tuyến đánh dấu</label>
+        <h3 class="subheading">Đường biểu diễn</h3>
+        <label class="check"><input type="checkbox" id="t-axis" checked><span class="sw" style="--sw:var(--amber)"></span>Trục quay và góc nghiêng</label>
+        <label class="check"><input type="checkbox" id="t-plane" checked><span class="sw" style="--sw:var(--cyan)"></span>Mặt phẳng quỹ đạo</label>
+        <label class="check"><input type="checkbox" id="t-eq" checked><span class="sw" style="--sw:var(--violet)"></span>Đường xích đạo</label>
+        <label class="check"><input type="checkbox" id="t-mer" checked><span class="sw" style="--sw:var(--pink)"></span>Kinh tuyến đánh dấu</label>
+      </div>
     </div>
 
     <p class="foot">Bề mặt trong mô phỏng được tạo tự động để minh họa, không phải ảnh chụp thật. Độ nghiêng, chu kỳ quay và kích thước lấy theo bảng số liệu hành tinh của NASA. Các thiên thể không vẽ đúng tỉ lệ kích thước.</p>

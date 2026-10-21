@@ -521,6 +521,21 @@ async function initSolarSystem() {
   }));
 }
 
+function updatePanelIndicator(name, dotColor){
+  const badgeText=$('panelBadgeText'), badgeDot=$('panelBadgeDot');
+  const expandTitle=$('expandBtnTitle'), expandDot=$('expandBtnDot');
+  const expandBtn=$('panelExpandBtn');
+  if(badgeText) badgeText.textContent=name;
+  if(expandTitle) expandTitle.textContent=name;
+  if(badgeDot){ badgeDot.style.background=dotColor; badgeDot.style.boxShadow='0 0 8px '+dotColor; }
+  if(expandDot){ expandDot.style.background=dotColor; expandDot.style.boxShadow='0 0 8px '+dotColor; }
+  if(expandBtn){
+    expandBtn.classList.remove('flash-update');
+    void expandBtn.offsetWidth;
+    expandBtn.classList.add('flash-update');
+  }
+}
+
 function showSolarSystem() {
   appMode = 'solar';
   disposeCurrent();
@@ -530,6 +545,7 @@ function showSolarSystem() {
   $('name').textContent = 'Hệ Mặt Trời';
   $('sub').textContent = 'Mô phỏng tổng quan hệ hành tinh của chúng ta';
   $('fact').textContent = 'Kéo chuột trái để xoay, chuột phải (hoặc 2 ngón) để dịch chuyển bản đồ, cuộn để thu phóng. Nhấp vào hành tinh bất kỳ để xem chi tiết.';
+  updatePanelIndicator('Hệ Mặt Trời', '#ffb454');
   rail.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed','false'));
   document.title = 'Hệ Mặt Trời | Xoay hành tinh 3D';
   
@@ -865,6 +881,7 @@ async function select(id){
   
   buildBody(def,tex);
   showInfo(def);
+  updatePanelIndicator(def.name, def.disc ? def.disc[0] : '#6fd3ff');
   $('btn-back-solar').style.display = 'block';
   $('planetOnlyInfo').style.display = 'block';
   $('planetViews').style.display = 'block';
@@ -974,6 +991,73 @@ function frame(now){
   renderer.render(scene,camera);
   requestAnimationFrame(frame);
 }
+/* ---------- Quản lý Thu gọn / Sổ xuống Bảng thông tin ---------- */
+let isPanelCollapsed = false;
+
+function setPanelCollapsed(collapsed) {
+  isPanelCollapsed = !!collapsed;
+  const app = $('app');
+  const collapseBtn = $('panelCollapseBtn');
+  const btnText = collapseBtn ? collapseBtn.querySelector('.btn-text') : null;
+  
+  if (isPanelCollapsed) {
+    app.classList.add('panel-collapsed');
+    if (btnText) btnText.textContent = 'Mở';
+    if (collapseBtn) collapseBtn.setAttribute('title', 'Mở bảng thông tin (Phím I)');
+  } else {
+    app.classList.remove('panel-collapsed');
+    if (btnText) btnText.textContent = 'Thu gọn';
+    if (collapseBtn) collapseBtn.setAttribute('title', 'Thu gọn bảng thông tin (Phím I)');
+  }
+  
+  setTimeout(resize, 360);
+}
+
+function togglePanel() {
+  setPanelCollapsed(!isPanelCollapsed);
+}
+
+const collapseBtn = $('panelCollapseBtn');
+if (collapseBtn) collapseBtn.addEventListener('click', () => setPanelCollapsed(true));
+
+const expandBtn = $('panelExpandBtn');
+if (expandBtn) expandBtn.addEventListener('click', () => setPanelCollapsed(false));
+
+const mobileDragBar = $('mobileDragBar');
+if (mobileDragBar) mobileDragBar.addEventListener('click', togglePanel);
+
+const headerBar = document.querySelector('.panel-header-bar');
+if (headerBar) {
+  headerBar.addEventListener('click', e => {
+    if (e.target.closest('#panelCollapseBtn')) return;
+    if (isPanelCollapsed || window.innerWidth <= 860) {
+      togglePanel();
+    }
+  });
+}
+
+document.querySelectorAll('.accordion-header').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const section = btn.closest('.accordion-section');
+    if (section) {
+      const isOpen = section.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(isOpen));
+    }
+  });
+});
+
+window.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'i' || e.key === 'I') {
+    e.preventDefault();
+    togglePanel();
+  } else if (e.key === 'Escape' && !isPanelCollapsed) {
+    e.preventDefault();
+    setPanelCollapsed(true);
+  }
+});
+
 resize();
 setSpeedFromSlider();
 if(!REDUCE) setPlaying(true);
